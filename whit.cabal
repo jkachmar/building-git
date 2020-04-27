@@ -1,0 +1,113 @@
+cabal-version: 2.4
+name:
+  whit
+version:
+  0.0.1
+synopsis:
+  Building Git, in Haskell.
+description:
+  Following along with James Coglan's "Building Git" in Haskell.
+bug-reports:
+  https://github.com/jkachmar/building-git.git
+license:
+  MPL-2.0
+license-file:
+  license
+author:
+  jkachmar
+extra-source-files:
+  readme.md
+
+
+-------------------------------------------------------------------------------
+-- XXX: Petty complaints...
+--
+-- ______________________________________________
+-- | For want of a nail the shoe was lost.      |
+-- | For want of a shoe the horse was lost.     |
+-- | For want of a horse the rider was lost.    |
+-- | For want of a rider the message was lost.  |
+-- | For want of a message the battle was lost. |
+-- | For want of a battle the kingdom was lost. |
+-- | And all for the want of a horseshoe nail.  |
+-- ----------------------------------------------
+--
+-- Cabal is still fundamentally incapable of automatically populating the
+-- `exposed-modules` and `other-modules` stanzas; it seems that despite
+-- `cabal-install` being more widely recommended, numerous papercuts remain
+-- due to a lack of willingness or capacity to address them.
+--
+-- For the sake of convenience (and to avoid having to call `hpack` every time
+-- I invoke this cursed build tool), I will depend on the `autopack` library.
+--
+-- `custom-setup` is an abberation, but this is a fun side-project and I'll
+-- take the loss here for the sake of my own convenience.
+build-type:
+  Custom
+
+custom-setup
+  setup-depends:
+      base
+    , autopack
+
+-------------------------------------------------------------------------------
+common common
+  default-language: Haskell2010
+
+  ghc-options:
+    -Weverything
+    -Wno-missing-exported-signatures
+    -Wno-missing-import-lists
+    -Wno-missing-export-lists
+    -Wno-missed-specialisations
+    -Wno-all-missed-specializations
+    -Wno-unsafe
+    -Wno-safe
+    -Wno-missing-local-signatures
+    -Wno-monomorphism-restriction
+
+  default-extensions:
+    NoImplicitPrelude
+    OverloadedStrings
+    ScopedTypeVariables
+
+  build-depends:
+    -- Alternative prelude
+      relude ^>= 0.6
+    -- Convenient libraries to keep around that are included with GHC anyway
+    , base
+    , bytestring
+    , text
+    -- 'lens'-based stuff
+    , lens ^>= 4.19
+    , lens-aeson ^>= 1.1
+    , generic-lens ^>= 2.0
+    -- 'fused-effects' and related supporting libraries
+    , fused-effects -- pulling from git directly
+    , fused-effects-exceptions ^>= 1
+    , fused-effects-lens ^>= 1.2
+
+-------------------------------------------------------------------------------
+library
+  import: common
+  hs-source-dirs: library
+
+-------------------------------------------------------------------------------
+executable whit
+  import: common
+  hs-source-dirs: executables
+  main-is: Main.hs
+  build-depends: whit
+
+-------------------------------------------------------------------------------
+test-suite test
+  import: common
+  type: exitcode-stdio-1.0
+  hs-source-dirs: tests
+  main-is: Driver.hs
+  build-depends: whit
+
+-------------------------------------------------------------------------------
+source-repository head
+  type:     git
+  location: https://github.com/jkachmar/building-git
